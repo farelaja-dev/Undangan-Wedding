@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { ArrowDown, ArrowUpRight, CalendarDays, Camera, Check, ChevronLeft, ChevronRight, Clock3, Copy, Heart, MailOpen, Maximize2, Music2, Pause, Play, Send, Sparkles, Wine, X } from 'lucide-react';
 import { wedding as w } from './config';
-import { downloadFile, whatsappUrl } from './lib/guests';
+import { downloadFile, whatsappUrl, guestNameFromLocation } from './lib/guests';
 import { Floral, Ornament, Petals, Reveal, useReducedMotion } from './components/Motion';
 import './luxury.css';
 import './readability.css';
@@ -129,7 +129,7 @@ function RSVP({ guest, notify }) {
 }
 
 export default function Invitation() {
-  const guest = new URLSearchParams(window.location.search).get('to')?.trim().slice(0, 150) || 'Tamu Undangan';
+  const guest = guestNameFromLocation(window.location);
   const [cover, setCover] = useState('closed');
   const [toast, setToast] = useState('');
   const [playing, setPlaying] = useState(false);

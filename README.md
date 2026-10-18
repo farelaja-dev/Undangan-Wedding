@@ -26,7 +26,7 @@ npm install
 npm run dev
 ```
 
-Buka alamat yang ditampilkan Vite. Halaman undangan berada di `/`; pengelola tamu ada di `/admin`. Contoh undangan personal: `/?to=Bapak%20Budi%20dan%20Ibu%20Sari`.
+Buka alamat yang ditampilkan Vite. Halaman undangan berada di `/`; pengelola tamu ada di `/admin`. Contoh undangan personal: `/pak-halim` menampilkan Pak Halim di cover dan formulir. Link lama `?to=...` tetap berfungsi.
 
 ## Ubah isi undangan
 
@@ -79,8 +79,10 @@ Foto contoh diunduh dari Unsplash: [foto utama](https://unsplash.com/photos/phot
 2. Isi kolom `nama` (wajib), `telepon` dan `grup` (opsional). Kolom nomor sebaiknya berformat teks di Excel agar digitnya tidak berubah.
 3. Impor CSV (maksimal 2 MB / 5.000 tamu per impor), periksa pratinjau, lalu klik **Impor**.
 4. Tamu dengan pasangan nama + nomor yang sama otomatis dilewati. Nama yang sama dengan nomor berbeda tetap dianggap tamu berbeda.
-5. Isi alamat website undangan dengan URL Vercel final. Tombol salin membuat link `?to=Nama+Tamu`; tombol WhatsApp menyiapkan pesan untuk dikirim secara manual. Tamu tanpa nomor akan membuka pemilih percakapan WhatsApp.
+5. Isi alamat website undangan dengan URL Vercel final. Link otomatis dibuat dari nama, misalnya `Pak Halim` menjadi `/pak-halim` dan `Ibu Sari` menjadi `/ibu-sari`; tombol salin menyalin link tersebut; tombol WhatsApp menyiapkan pesan untuk dikirim secara manual. Tamu tanpa nomor akan membuka pemilih percakapan WhatsApp.
 6. Cari/filter tamu, tambah manual, hapus, atau **Ekspor CSV** lengkap dengan link personal.
+
+Nama dengan gelar, tanda baca, aksen, atau kapitalisasi khusus mendapat parameter `?to=` tambahan agar nama di cover tetap persis seperti CSV. Nomor telepon tidak dimasukkan ke link. Tidak perlu menambah tabel Supabase atau deploy ulang setiap mengimpor tamu; link bekerja langsung dari path/parameter URL, termasuk pada perangkat tamu lain.
 
 CSV dengan koma di dalam nama harus menggunakan tanda kutip, misalnya `"Rizky, S.Kom."`. CSV UTF-8 dengan delimiter koma maupun titik koma didukung. Export melindungi sel yang berpotensi dibaca sebagai formula spreadsheet.
 

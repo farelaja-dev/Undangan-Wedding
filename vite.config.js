@@ -1,10 +1,16 @@
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import { optimizeImages } from './scripts/optimize-images.mjs';
+import { attachAdminAuth } from './server/admin-auth.js';
 
-export default defineConfig(async () => {
+export default defineConfig(async ({ mode }) => {
   await optimizeImages();
+  const serverEnv = { ...loadEnv(mode, process.cwd(), ''), ...process.env };
   return { plugins: [react(), {
+    name: 'wedding-admin-auth',
+    configureServer(server) { attachAdminAuth(server, serverEnv); },
+    configurePreviewServer(server) { attachAdminAuth(server, serverEnv); },
+  }, {
     name: 'wedding-responsive-images',
     configureServer(server) {
       let timer;

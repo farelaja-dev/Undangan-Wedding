@@ -6,13 +6,30 @@ export function normalizePhone(value = '') {
   return digits.startsWith('0') ? `62${digits.slice(1)}` : digits;
 }
 
+const reservedPaths = new Set(['admin', 'assets', 'photos', 'optimized', 'audio', 'decor', 'api']);
+
+export function guestNameFromLocation({ pathname = '/', search = '' } = {}) {
+  // Keep previously shared ?to= links working and preserve unusual spelling.
+  const explicit = new URLSearchParams(search).get('to')?.trim().slice(0, 150);
+  if (explicit) return explicit;
+  let slug;
+  try { slug = decodeURIComponent(pathname).replace(/^\/|\/$/g, ''); }
+  catch { return 'Tamu Undangan'; }
+  if (!slug || reservedPaths.has(slug.toLowerCase()) || !/^[\p{L}\p{N}]+(?:-[\p{L}\p{N}]+)*$/u.test(slug)) return 'Tamu Undangan';
+  return slug.split('-').map(word => word.charAt(0).toLocaleUpperCase('id') + word.slice(1).toLocaleLowerCase('id')).join(' ').slice(0, 150);
+}
+
 export function invitationUrl(base, name) {
   const url = new URL(base);
   if (!['http:', 'https:'].includes(url.protocol)) throw new Error('Gunakan alamat website http atau https.');
-  url.pathname = '/';
+  const displayName = name.trim().slice(0, 150);
+  if (!displayName) throw new Error('Nama tamu wajib diisi.');
+  let slug = displayName.normalize('NFKD').replace(/\p{M}/gu, '').toLocaleLowerCase('id').replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-|-$/g, '') || 'tamu';
+  if (reservedPaths.has(slug)) slug = `tamu-${slug}`;
+  url.pathname = `/${slug}`;
   url.search = '';
   url.hash = '';
-  url.searchParams.set('to', name.trim());
+  if (guestNameFromLocation(url) !== displayName) url.searchParams.set('to', displayName);
   return url.toString();
 }
 
