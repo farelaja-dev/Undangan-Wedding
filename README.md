@@ -1,5 +1,18 @@
 # Gita & Haidar — Undangan Pernikahan
 
+## Mengaktifkan ucapan bersama (Supabase)
+
+1. Di proyek Supabase milikmu, buka SQL Editor dan jalankan `supabase/wedding-wishes.sql`.
+2. Salin `.env.example` menjadi `.env.local`. Isi `VITE_SUPABASE_URL` dan `VITE_SUPABASE_PUBLISHABLE_KEY` dari Project Settings → API Keys. Gunakan **publishable key**, bukan secret/service_role key.
+3. Restart `npm run dev`. Untuk website online, isi kedua environment variable yang sama di Vercel lalu deploy ulang.
+4. Coba kirim ucapan dan buka undangan di perangkat lain. Komentar terbaru tampil lebih dulu, maksimal **5 ucapan per halaman**. Tombol **Sebelumnya / Berikutnya** mengganti halaman tanpa menambah panjang daftar. Ucapan panjang bisa dibuka lewat **Baca selengkapnya**. **Perbarui** dan pengiriman ucapan baru mengembalikan daftar ke halaman pertama.
+
+Tamu dapat membaca dan mengirim ucapan tanpa login. Nama dan ucapan bersifat publik bagi siapa pun yang membuka undangan; nama tamu tidak diverifikasi. Detail RSVP dan nomor telepon tidak disimpan di tabel komentar. Pemilik proyek bisa menghapus komentar melalui Table Editor Supabase. Kebijakan database melarang tamu mengubah atau menghapus komentar; belum ada CAPTCHA atau pembatasan spam di server.
+
+Saat konfigurasi belum diisi, formulir menampilkan “Kolom ucapan segera dibuka”; tidak ada komentar palsu atau penyimpanan lokal pengganti database. RSVP WhatsApp tetap aktif ke `6285706314694`.
+
+Referensi: [Supabase API keys](https://supabase.com/docs/guides/getting-started/api-keys) dan [Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security).
+
 Undangan floral sinematik berwarna dusty blue, ivory, dan champagne, menggunakan React, Vite, dan JavaScript. Siap di-host sebagai website statis di Vercel. Nama mempelai sudah sesuai: **Gita Firanddia Putri Ramadhiany** dan **Haidar Syaddad Al Faruqi**.
 
 Pengalaman dimulai dengan cover personal dan tombol **Buka Undangan**. Dua pintu terbuka dengan animasi, diikuti slider foto dengan zoom pelan, ornamen bunga bergerak, partikel kelopak dan cahaya, serta teks/foto yang muncul bertahap saat di-scroll. Tidak ada navbar. Pada desktop, foto sinematik menetap di kiri sementara undangan mengalir di kanan; pada HP, undangan memenuhi layar.
@@ -17,15 +30,15 @@ Buka alamat yang ditampilkan Vite. Halaman undangan berada di `/`; pengelola tam
 
 ## Ubah isi undangan
 
-Semua pengaturan utama berada di **`src/config.js`**. Tanggal dan lokasi sudah diatur untuk Kamis, 12 November 2026 di Agrowisata Gading Asri, Perumahan Taman Gading, Kabupaten Jember, Jawa Timur. Akad pukul 07.00 WIB sampai selesai; resepsi pukul 11.00 sampai 14.30 WIB. Data orang tua dan cerita masih contoh.
+Semua pengaturan utama berada di **`src/config.js`**. Tanggal dan lokasi sudah diatur untuk Kamis, 12 November 2026 di Agrowisata Gading Asri, Perumahan Taman Gading, Kabupaten Jember, Jawa Timur. Akad pukul 07.00 WIB sampai selesai; resepsi pukul 11.00 sampai 14.30 WIB. Data orang tua masih perlu diisi.
 
 - `bride` / `groom`: nama lengkap, panggilan, keluarga.
 - `date` / `endDate`: waktu acara dengan zona WIB (`+07:00`), untuk hitung mundur dan kalender.
 - `dateLabel` / `shortDate`: teks tanggal yang ditampilkan. Sesuaikan dengan `date`.
 - `events`: nama acara dan teks jam. Sesuaikan dengan tanggal dan waktu sebenarnya.
 - `venue`, `address`, `locationLabel`, `mapsUrl`: tempat dan link Google Maps.
-- `story`: tahun, judul, dan narasi perjalanan kalian.
-- `rsvpPhone`: nomor WhatsApp penerima, misalnya `6281234567890`. Jika kosong, RSVP dinonaktifkan dengan keterangan yang jelas. Pengunjung mengisi form, membuka WhatsApp, lalu menekan Kirim sendiri. Tidak ada database RSVP atau daftar ucapan publik.
+- `story`: judul dan narasi Awal Cerita, Lamaran, dan Pernikahan.
+- `rsvpPhone`: nomor WhatsApp penerima, misalnya `6281234567890`. Jika kosong, RSVP dinonaktifkan dengan keterangan yang jelas. Pengunjung mengisi form, membuka WhatsApp, lalu menekan Kirim sendiri. RSVP dikirim melalui WhatsApp; ucapan publik disimpan terpisah di Supabase.
 - `gift`: rekening opsional. Bagian hadiah muncul setelah `bank`, `account`, dan `holder` terisi.
 - `music`: sudah diisi `/audio/lagu.mp3`, menggunakan lagu dari `public/audio/lagu.mp3` dan diputar berulang. Musik mulai sesudah **Buka Undangan** ditekan. Ikon piringan berputar mengikuti pemutaran audio; ketuk untuk jeda/melanjutkan. Ganti dengan file yang boleh kamu gunakan di `public/audio/`, misalnya `/audio/our-song.mp3`, atau kosongkan untuk menonaktifkan musik. Tidak ada autoplay sebelum interaksi tamu.
 - `musicVolume`: volume awal antara 0–1, default `0.35` agar musik tetap lembut. Sumber pembuatan instrumental ada di `scripts/generate_music.py` (Python standard library, tidak diperlukan untuk menjalankan/deploy website).
@@ -34,6 +47,10 @@ Semua pengaturan utama berada di **`src/config.js`**. Tanggal dan lokasi sudah d
 Jika kelak mengganti nama pasangan, sesuaikan juga judul dan metadata awal di `index.html`.
 
 ## Di mana foto diganti?
+
+Foto asli tetap berada di `public/photos/`. Saat `npm run dev` atau `npm run build`, Sharp otomatis membuat WebP responsif (160, 480, 800, 1280, dan 1800 px) ke `public/optimized/`, beserta manifest di `src/generated/`. Ornamen bunga juga dibuat versi WebP dengan transparansi. Kedua hasil generasi tidak perlu di-commit; Vercel membuatnya saat build. Jangan memakai instalasi yang menghapus devDependencies pada tahap build.
+
+Saat mengganti file foto ketika Vite berjalan, versi ringan dibuat ulang otomatis. Nama hasil memakai hash isi foto sehingga foto baru tidak tertahan cache lama. Path foto dalam `src/config.js` tetap menunjuk file asli. Thumbnail memakai versi kecil; browser memilih resolusi sesuai lebar layar. Slider hanya memuat foto awal dan menyiapkan foto berikutnya saat berjalan, serta berhenti beranimasi ketika keluar layar. Panel foto desktop tidak memuat gambar pada HP. Referensi: [gambar responsif web.dev](https://web.dev/learn/design/responsive-images?hl=en).
 
 Penanda **FOTO 01–06** ditampilkan di undangan. Panduan visual juga ada di `/admin` → **Panduan foto**.
 

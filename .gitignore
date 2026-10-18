@@ -5,3 +5,5 @@ dist/
 .env.*
 !.env.example
 test-results/
+public/optimized/
+src/generated/photo-manifest.json

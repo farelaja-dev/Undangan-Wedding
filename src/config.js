@@ -1,4 +1,4 @@
-// Nama, tanggal, dan lokasi sudah sesuai. Keluarga dan cerita masih contoh.
+// Nama, tanggal, lokasi, dan cerita sudah sesuai. Data orang tua masih perlu diisi.
 // FOTO: letakkan file di public/photos/, lalu ubah path di bawah.
 // Nama file boleh berbeda, asalkan path di sini sama dengan nama file kamu.
 export const wedding = {
@@ -26,11 +26,11 @@ export const wedding = {
     { src: '/photos/foto6.jpg', caption: 'Rumah adalah di mana kamu berada.' }, // FOTO 06
   ],
   story: [
-    { year: '2021', title: 'Sebuah pertemuan', text: 'Dari sebuah pertemuan sederhana, percakapan kecil tumbuh menjadi cerita yang selalu ingin kami lanjutkan.' },
-    { year: '2024', title: 'Memilih untuk bersama', text: 'Melalui banyak cerita dan perjalanan, kami menemukan tempat pulang dalam diri satu sama lain.' },
-    { year: '2026', title: 'Menuju selamanya', text: 'Dengan restu keluarga, kami memulai babak baru. Satu janji, dua hati, dan perjalanan seumur hidup.' },
+    { title: 'Awal Cerita', text: 'Berawal dari sapaan singkat dan obrolan tanpa arah, kami perlahan menemukan ruang di hati satu sama lain. Setiap cerita yang terbagi membuat jarak di antara kami makin terkikis. Tanpa disadari, kebersamaan demi kebersamaan melahirkan rasa nyaman yang terus berakar. Hari demi hari berlalu, dan perasaan itu tak sekadar tinggal, melainkan tumbuh menjadi fondasi yang kian kuat untuk mengarungi masa depan bersama.' },
+    { title: 'Lamaran', text: 'Berbekal niat tulus dan hangatnya restu keluarga besar, kami mantap melangkah ke jenjang yang lebih serius. Momen lamaran ini menjadi saksi awal ikatan suci kami—sebuah titik mula untuk melangkah bersama, saling melengkapi, dan menyongsong masa depan yang penuh doa serta keberkahan.' },
+    { title: 'Pernikahan', text: 'Hari yang kami impikan kini nyata di depan mata, sebuah puncak dari segala cerita dan komitmen yang telah kami bangun. Dalam ikatan suci pernikahan ini, kami menyatukan niat dan langkah untuk mengarungi masa depan bersama. Semoga rumah tangga yang kami bina menjadi tempat paling aman untuk pulang, tumbuh dalam balutan kasih sayang yang tulus, serta senantiasa diliputi doa-doa baik dan keberkahan yang melimpah.' },
   ],
-  rsvpPhone: '', // WA penerima RSVP, format internasional: 6281234567890. WA terbuka setelah form diisi.
+  rsvpPhone: '6285706314694', // WhatsApp penerima konfirmasi kehadiran
   gift: { bank: '', account: '', holder: '' }, // Opsional: isi ketiganya untuk menampilkan rekening hadiah
   music: '/audio/lagu.mp3', // Musik mulai setelah tombol Buka Undangan ditekan.
   musicVolume: 0.35, // Volume awal 0–1. Musik mulai sesudah tamu menekan Buka Undangan.

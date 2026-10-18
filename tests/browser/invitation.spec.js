@@ -20,7 +20,7 @@ test('invitation shows real names, personal guest, working gallery and calendar'
   await expect(page.getByRole('heading', { name: 'Haidar Syaddad Al Faruqi' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Gita Firanddia Putri Ramadhiany' })).toBeVisible();
   await expect(page.getByLabel('Nama lengkap')).toHaveValue('Bapak Budi & Ibu Sari');
-  await expect(page.getByRole('button', { name: 'Kirim konfirmasi' })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Kirim konfirmasi' })).toBeEnabled();
   await page.getByLabel('Belum bisa hadir', { exact: true }).check();
   await expect(page.getByLabel('Jumlah tamu')).toHaveCount(0);
   const downloadEvent = page.waitForEvent('download');

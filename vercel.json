@@ -2,5 +2,5 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
-  "rewrites": [{ "source": "/((?!assets/|photos/|favicon.svg|contoh-tamu.csv).*)", "destination": "/index.html" }]
+  "rewrites": [{ "source": "/((?!assets/|photos/|optimized/|audio/|decor/|favicon.svg|contoh-tamu.csv).*)", "destination": "/index.html" }]
 }

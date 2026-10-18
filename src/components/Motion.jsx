@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { imageProps } from '../lib/images';
 
 export function useReducedMotion() {
   const [reduced, setReduced] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -27,7 +28,7 @@ export function Reveal({ children, className = '', delay = 0, direction = 'up', 
 }
 
 export function Floral({ className = '' }) {
-  return <div className={`floral ${className}`} aria-hidden="true"><img src="/decor/floral-bouquet.png" alt="" draggable="false" /></div>;
+  return <div className={`floral ${className}`} aria-hidden="true"><img {...imageProps("/decor/floral-bouquet.png", "(max-width: 800px) 280px, 520px")} alt="" draggable="false" /></div>;
 }
 
 export function Ornament({ className = '' }) {

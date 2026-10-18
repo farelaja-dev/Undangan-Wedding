@@ -6,15 +6,17 @@ import { Floral, Ornament, Petals, Reveal, useReducedMotion } from './components
 import './luxury.css';
 import './readability.css';
 import PortraitOrnament from './components/PortraitOrnament';
+import GuestWishes from './components/GuestWishes';
+import { imageProps, panelSizes } from './lib/images';
 
 const coupleNames = `${w.bride.name} & ${w.groom.name}`;
 const heroSlides = (w.heroSlides?.length ? w.heroSlides : [w.heroPhoto]).filter(Boolean);
 
-function Photo({ src, label, className = '', alt, priority = false }) {
+function Photo({ src, label, className = '', alt, priority = false, sizes = panelSizes }) {
   const [failed, setFailed] = useState(!src);
   useEffect(() => setFailed(!src), [src]);
   return <div className={`photo ${className} ${failed ? 'photo-empty' : ''}`}>
-    {!failed && <img src={src} alt={alt} loading={priority ? 'eager' : 'lazy'} fetchPriority={priority ? 'high' : 'auto'} onError={() => setFailed(true)} />}
+    {!failed && <img {...imageProps(src, sizes)} alt={alt} loading={priority ? 'eager' : 'lazy'} fetchPriority={priority ? 'high' : 'auto'} onError={() => setFailed(true)} />}
     {failed && <div className="photo-placeholder"><Camera size={25} strokeWidth={1} /><span>{alt}</span><small>Tempat untuk foto kalian</small></div>}
     {w.showPhotoLabels && label && <span className="photo-label"><Camera size={11} /> {label}</span>}
   </div>;
@@ -34,16 +36,34 @@ function Cover({ guest, state, onOpen }) {
   </div>;
 }
 
-function CinematicSlider({ className = '', active = true, initialIndex = 0, children }) {
+function CinematicSlider({ className = '', active = true, initialIndex = 0, desktopOnly = false, children }) {
   const [index, setIndex] = useState(initialIndex % heroSlides.length);
   const [paused, setPaused] = useState(false);
   const reduced = useReducedMotion();
+  const container = useRef(null);
+  const [inView, setInView] = useState(false);
+  const [desktop, setDesktop] = useState(() => window.matchMedia('(min-width: 801px)').matches);
+  const [loaded, setLoaded] = useState(() => new Set([initialIndex % heroSlides.length]));
+  const enabled = !desktopOnly || desktop;
+  const running = active && enabled && inView && !paused && !reduced;
   useEffect(() => {
-    if (!active || paused || reduced || heroSlides.length < 2) return;
+    const media = window.matchMedia('(min-width: 801px)');
+    const update = () => setDesktop(media.matches);
+    media.addEventListener('change', update);
+    const observer = new IntersectionObserver(entries => setInView(entries[0].isIntersecting));
+    observer.observe(container.current);
+    return () => { media.removeEventListener('change', update); observer.disconnect(); };
+  }, []);
+  useEffect(() => {
+    if (!running) return;
+    setLoaded(previous => new Set([...previous, index, (index + 1) % heroSlides.length]));
+  }, [running, index]);
+  useEffect(() => {
+    if (!running || heroSlides.length < 2) return;
     const id = setInterval(() => { if (!document.hidden) setIndex(i => (i + 1) % heroSlides.length); }, 6500);
     return () => clearInterval(id);
-  }, [active, paused, reduced]);
-  return <div className={`cinematic-slider ${className}`} aria-roledescription="carousel" aria-label="Foto perjalanan Gita dan Haidar"><div className="cinematic-images">{heroSlides.map((src, i) => <div key={i} className={`cinematic-slide ${i === index ? 'active' : ''}`} aria-hidden={i !== index}><img src={src} alt={`Foto bersama ${coupleNames}, ${i + 1}`} fetchPriority={i === 0 ? 'high' : 'auto'} /></div>)}</div><div className="cinematic-tint" />{children}<div className="cinematic-controls"><span className="slide-number">0{index + 1}<i />0{heroSlides.length}</span><div className="slide-dots">{heroSlides.map((_, i) => <button key={i} className={i === index ? 'active' : ''} aria-label={`Tampilkan foto pembuka ${i + 1}`} aria-pressed={i === index} onClick={() => { setIndex(i); setPaused(true); }} />)}</div><button className="slide-pause" aria-label={paused || reduced ? 'Putar slideshow' : 'Jeda slideshow'} onClick={() => setPaused(!paused)} disabled={reduced}>{paused || reduced ? <Play size={12} /> : <Pause size={12} />}</button></div></div>;
+  }, [running]);
+  return <div ref={container} className={`cinematic-slider ${running ? 'motion-active' : ''} ${className}`} aria-roledescription="carousel" aria-label="Foto perjalanan Gita dan Haidar"><div className="cinematic-images">{heroSlides.map((src, i) => <div key={i} className={`cinematic-slide ${i === index ? 'active' : ''}`} aria-hidden={i !== index}>{enabled && (i === index || loaded.has(i)) && <img {...imageProps(src, desktopOnly ? '(max-width: 1100px) 52vw, (max-width: 1348px) 54vw, calc(100vw - 620px)' : panelSizes)} alt={`Foto bersama ${coupleNames}, ${i + 1}`} fetchPriority={i === initialIndex ? 'high' : 'low'} />}</div>)}</div><div className="cinematic-tint" />{children}<div className="cinematic-controls"><span className="slide-number">0{index + 1}<i />0{heroSlides.length}</span><div className="slide-dots">{heroSlides.map((_, i) => <button key={i} className={i === index ? 'active' : ''} aria-label={`Tampilkan foto pembuka ${i + 1}`} aria-pressed={i === index} onClick={() => { setIndex(i); setPaused(true); }} />)}</div><button className="slide-pause" aria-label={paused || reduced ? 'Putar slideshow' : 'Jeda slideshow'} onClick={() => setPaused(!paused)} disabled={reduced}>{paused || reduced ? <Play size={12} /> : <Pause size={12} />}</button></div></div>;
 }
 
 function Countdown() {
@@ -91,8 +111,8 @@ function Gallery({ active = true }) {
     <Reveal direction="zoom" className="gallery-stage"><div className="gallery-carousel" aria-roledescription="carousel" aria-label="Galeri kenangan" onTouchStart={e => { touch.current = e.touches[0].clientX; }} onTouchEnd={e => { if (touch.current !== null) { const delta = touch.current - e.changedTouches[0].clientX; if (Math.abs(delta) > 45) step(delta > 0 ? 1 : -1); touch.current = null; } }}>
       {w.gallery.map((photo, i) => <button className={`gallery-slide ${i === index ? 'active' : ''}`} key={photo.src} aria-hidden={i !== index} tabIndex={i === index ? 0 : -1} onClick={() => { setPaused(true); dialog.current.showModal(); }} aria-label={`Perbesar foto ${i + 1}`}><Photo src={photo.src} alt={photo.caption} label={`FOTO 0${i + 4} · GALERI`} /><span className="expand-image"><Maximize2 size={16} /></span></button>)}
       <button className="gallery-arrow previous" onClick={() => step(-1)} aria-label="Slide sebelumnya"><ChevronLeft size={19} /></button><button className="gallery-arrow next" onClick={() => step(1)} aria-label="Slide berikutnya"><ChevronRight size={19} /></button>
-    </div><div className="gallery-progress"><span>0{index + 1}</span><div className="gallery-progress-line"><i style={{ width: `${((index + 1) / w.gallery.length) * 100}%` }} /></div><span>0{w.gallery.length}</span><button aria-label={paused || reduced ? 'Putar galeri otomatis' : 'Jeda galeri otomatis'} onClick={() => setPaused(!paused)} disabled={reduced}>{paused || reduced ? <Play size={13} /> : <Pause size={13} />}</button></div><p className="gallery-quote" key={index}>{w.gallery[index].caption}</p><div className="gallery-thumbnails">{w.gallery.map((photo, i) => <button key={photo.src} onClick={() => { setIndex(i); setPaused(true); }} aria-label={`Pilih foto galeri ${i + 1}`} aria-pressed={index === i} className={index === i ? 'active' : ''}><img src={photo.src} alt="" loading="lazy" /></button>)}</div></Reveal>
-    <dialog ref={dialog} className="lightbox" aria-label="Galeri foto pernikahan" onClick={e => { if (e.target === e.currentTarget) dialog.current.close(); }} onKeyDown={e => { if (e.key === 'ArrowRight') step(1); if (e.key === 'ArrowLeft') step(-1); }}><button className="icon-button lightbox-close" aria-label="Tutup foto" onClick={() => dialog.current.close()}><X /></button><Photo src={w.gallery[index].src} alt={w.gallery[index].caption} /><div className="lightbox-controls"><button className="icon-button" aria-label="Foto sebelumnya" onClick={() => step(-1)}><ChevronLeft /></button><p>{w.gallery[index].caption}</p><button className="icon-button" aria-label="Foto berikutnya" onClick={() => step(1)}><ChevronRight /></button></div></dialog>
+    </div><div className="gallery-progress"><span>0{index + 1}</span><div className="gallery-progress-line"><i style={{ width: `${((index + 1) / w.gallery.length) * 100}%` }} /></div><span>0{w.gallery.length}</span><button aria-label={paused || reduced ? 'Putar galeri otomatis' : 'Jeda galeri otomatis'} onClick={() => setPaused(!paused)} disabled={reduced}>{paused || reduced ? <Play size={13} /> : <Pause size={13} />}</button></div><p className="gallery-quote" key={index}>{w.gallery[index].caption}</p><div className="gallery-thumbnails">{w.gallery.map((photo, i) => <button key={photo.src} onClick={() => { setIndex(i); setPaused(true); }} aria-label={`Pilih foto galeri ${i + 1}`} aria-pressed={index === i} className={index === i ? 'active' : ''}><img {...imageProps(photo.src, "70px")} alt="" loading="lazy" /></button>)}</div></Reveal>
+    <dialog ref={dialog} className="lightbox" aria-label="Galeri foto pernikahan" onClick={e => { if (e.target === e.currentTarget) dialog.current.close(); }} onKeyDown={e => { if (e.key === 'ArrowRight') step(1); if (e.key === 'ArrowLeft') step(-1); }}><button className="icon-button lightbox-close" aria-label="Tutup foto" onClick={() => dialog.current.close()}><X /></button><Photo sizes="90vw" src={w.gallery[index].src} alt={w.gallery[index].caption} /><div className="lightbox-controls"><button className="icon-button" aria-label="Foto sebelumnya" onClick={() => step(-1)}><ChevronLeft /></button><p>{w.gallery[index].caption}</p><button className="icon-button" aria-label="Foto berikutnya" onClick={() => step(1)}><ChevronRight /></button></div></dialog>
   </section>;
 }
 
@@ -105,7 +125,7 @@ function RSVP({ guest, notify }) {
     window.open(whatsappUrl(w.rsvpPhone, message), '_blank', 'noopener,noreferrer');
     notify('Pesan disiapkan di WhatsApp. Tekan Kirim di WhatsApp untuk mengonfirmasi.');
   }
-  return <section id="rsvp" className="lux-rsvp lux-section"><Floral className="rsvp-floral" /><Reveal><Ornament /><span className="lux-kicker">THE JOY IS IN SHARING IT</span><h2>Lengkapi<br /><em>bahagia kami.</em></h2><p>Satu doa darimu, sejuta arti untuk kami.<br />Kami menantikan kehadiran dan doa baik Anda.</p></Reveal><Reveal delay={150}><form className="lux-rsvp-form" onSubmit={submit}><h3>Konfirmasi kehadiran</h3><p>Kabar baikmu akan dikirim melalui WhatsApp.</p><label>Nama lengkap<input name="name" defaultValue={guest === 'Tamu Undangan' ? '' : guest} placeholder="Tulis nama Anda" required maxLength={150} /></label><fieldset><legend>Apakah Anda akan hadir?</legend><div className="attendance-options">{['Hadir', 'Belum bisa hadir'].map(option => <label key={option} className={attendance === option ? 'selected' : ''}><input type="radio" name="attendance" value={option} checked={attendance === option} onChange={() => setAttendance(option)} />{option === 'Hadir' ? <Check size={16} /> : <Heart size={16} />}{option}</label>)}</div></fieldset>{attendance === 'Hadir' && <label>Jumlah tamu<select name="count" defaultValue="1">{[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n} orang</option>)}</select></label>}<label>Ucapan & doa<textarea name="wish" placeholder="Titipkan doa baik untuk Gita & Haidar…" rows={3} maxLength={1000} /></label><button className="lux-button" type="submit" disabled={!w.rsvpPhone}>Kirim konfirmasi <Send size={15} /></button>{!w.rsvpPhone && <small className="setup-note">RSVP belum dibuka. Nomor WhatsApp penerima belum diatur.</small>}</form></Reveal></section>;
+  return <section id="rsvp" className="lux-rsvp lux-section"><Floral className="rsvp-floral" /><Reveal><Ornament /><span className="lux-kicker">THE JOY IS IN SHARING IT</span><h2>Lengkapi<br /><em>bahagia kami.</em></h2><p>Satu doa darimu, sejuta arti untuk kami.<br />Kami menantikan kehadiran dan doa baik Anda.</p></Reveal><Reveal delay={150}><form className="lux-rsvp-form" onSubmit={submit}><h3>Konfirmasi kehadiran</h3><p>Kabar baikmu akan dikirim melalui WhatsApp.</p><label>Nama lengkap<input name="name" defaultValue={guest === 'Tamu Undangan' ? '' : guest} placeholder="Tulis nama Anda" required maxLength={150} /></label><fieldset><legend>Apakah Anda akan hadir?</legend><div className="attendance-options">{['Hadir', 'Belum bisa hadir'].map(option => <label key={option} className={attendance === option ? 'selected' : ''}><input type="radio" name="attendance" value={option} checked={attendance === option} onChange={() => setAttendance(option)} />{option === 'Hadir' ? <Check size={16} /> : <Heart size={16} />}{option}</label>)}</div></fieldset>{attendance === 'Hadir' && <label>Jumlah tamu<select name="count" defaultValue="1">{[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n} orang</option>)}</select></label>}<label>Ucapan & doa<textarea name="wish" placeholder="Titipkan doa baik untuk Gita & Haidar…" rows={3} maxLength={1000} /></label><button className="lux-button" type="submit" disabled={!w.rsvpPhone}>Kirim konfirmasi <Send size={15} /></button>{!w.rsvpPhone && <small className="setup-note">RSVP belum dibuka. Nomor WhatsApp penerima belum diatur.</small>}</form></Reveal><Reveal><GuestWishes guest={guest} /></Reveal></section>;
 }
 
 export default function Invitation() {
@@ -130,11 +150,11 @@ export default function Invitation() {
   }, [cover, reduced, effects]);
   function openInvitation() { if (cover !== 'closed') return; window.scrollTo({ top: 0, behavior: 'instant' }); setCover('opening'); if (audio.current) { audio.current.volume = Math.min(1, Math.max(0, w.musicVolume ?? 0.35)); audio.current.play().catch(() => setToast('Ketuk ikon piringan untuk mulai memutar musik.')); } }
   async function toggleMusic() { if (playing) { audio.current.pause(); setPlaying(false); } else { try { await audio.current.play(); setPlaying(true); } catch { setToast('Musik belum dapat diputar. Periksa file audio.'); } } }
-  return <div className={`luxury ${cover === 'open' ? 'invitation-open' : ''} ${!effects ? 'effects-paused' : ''}`}>
+  return <div data-cover-state={cover} className={`luxury ${cover === 'open' ? 'invitation-open' : ''} ${!effects ? 'effects-paused' : ''}`}>
     <Petals active={effects} />
     {cover !== 'open' && <Cover guest={guest} state={cover} onOpen={openInvitation} />}
     <div className="invitation-shell" inert={cover !== 'open' ? true : undefined} aria-hidden={cover !== 'open'}>
-      <aside className="wedding-backdrop"><CinematicSlider initialIndex={1} active={cover === 'open' && effects}><div className="backdrop-frame" /><div className="backdrop-copy"><span className="lux-kicker">TOGETHER IS A BEAUTIFUL PLACE TO BE</span><Names /><Ornament /><p>Two souls, one beautiful journey.</p><span className="backdrop-date">{w.shortDate}</span></div><Floral className="backdrop-floral" /><span className="backdrop-vertical">THE WEDDING CELEBRATION OF HAIDAR & GITA</span></CinematicSlider></aside>
+      <aside className="wedding-backdrop"><CinematicSlider desktopOnly initialIndex={1} active={cover === 'open' && effects}><div className="backdrop-frame" /><div className="backdrop-copy"><span className="lux-kicker">TOGETHER IS A BEAUTIFUL PLACE TO BE</span><Names /><Ornament /><p>Two souls, one beautiful journey.</p><span className="backdrop-date">{w.shortDate}</span></div><Floral className="backdrop-floral" /><span className="backdrop-vertical">THE WEDDING CELEBRATION OF HAIDAR & GITA</span></CinematicSlider></aside>
       <main ref={main} tabIndex={-1} className="invitation-scroll" aria-label="Isi undangan pernikahan">
         <section id="home" className="lux-hero"><CinematicSlider active={cover === 'open' && effects}><div className="hero-arch-line" /><div className="lux-hero-copy"><span className="lux-kicker">THE WEDDING OF</span><Names /><Ornament /><p>{w.dateLabel}</p><span className="hero-location">{w.locationLabel}</span></div><a className="scroll-invitation" href="#doa"><span>OUR FOREVER BEGINS HERE</span><span className="scroll-line" /><ArrowDown size={13} /></a>{w.showPhotoLabels && <span className="hero-photo-marker"><Camera size={10} /> FOTO 01 · FOTO UTAMA</span>}</CinematicSlider><Floral className="hero-bottom-floral" /></section>
         <section id="doa" className="lux-prayer lux-section"><Floral className="prayer-floral" /><Reveal><span className="arabic-bismillah" lang="ar" dir="rtl">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</span></Reveal><Reveal delay={100}><span className="lux-kicker">IN THE NAME OF ALLAH, THE MOST MERCIFUL</span><h2>Ditulis oleh takdir.<br /><em>Disatukan oleh cinta.</em></h2></Reveal><Reveal delay={200}><p>“Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya, dan Dia menjadikan di antaramu rasa kasih dan sayang.”</p><span className="verse">QS. Ar-Rum: 21</span><Ornament /></Reveal></section>
@@ -144,14 +164,14 @@ export default function Invitation() {
             <span className="lux-script person-nickname">{w.bride.name}</span><h3>{w.bride.fullName}</h3><span className="person-rule" /><p>{w.bride.parents}</p>
           </Reveal>
           <Reveal direction="zoom" className="couple-shared-photo">
-            <div className="portrait-frame"><Photo src={w.couplePhoto} alt="Foto bersama Gita dan Haidar" label="FOTO 02 · FOTO BERSAMA" /><PortraitOrnament /></div>
+            <div className="portrait-frame"><Photo sizes="(max-width: 800px) 245px, 270px" src={w.couplePhoto} alt="Foto bersama Gita dan Haidar" label="FOTO 02 · FOTO BERSAMA" /><PortraitOrnament /></div>
           </Reveal>
           <Reveal direction="right" className="lux-person">
             <span className="lux-script person-nickname">{w.groom.name}</span><h3>{w.groom.fullName}</h3><span className="person-rule" /><p>{w.groom.parents}</p>
           </Reveal>
         </section>
         <section id="acara" className="lux-events lux-section"><Floral className="events-floral" /><Reveal><Ornament /><span className="lux-kicker">A DAY TO REMEMBER</span><h2>The beginning<br />of <em>always.</em></h2><p>Setiap detik membawa kami lebih dekat<br />pada janji untuk selamanya.</p></Reveal><Reveal delay={150}><Countdown /></Reveal>{w.events.map((event, i) => <Reveal key={event.title} delay={100} direction={i ? 'right' : 'left'} className="lux-event-card"><span className="event-script">{i ? 'the celebration' : 'the sacred promise'}</span>{event.icon === 'glass' ? <Wine size={24} strokeWidth={1} /> : <span className="lux-rings">○○</span>}<h3>{event.title}</h3><span className="event-fine-line" /><div className="lux-event-date"><CalendarDays size={14} />{w.dateLabel}</div><div className="lux-event-date"><Clock3 size={14} />{event.time}</div><strong>{w.venue}</strong><p>{w.address}</p><a className="lux-button lux-button-light" href={w.mapsUrl} target="_blank" rel="noreferrer">Petunjuk lokasi <ArrowUpRight size={14} /></a></Reveal>)}<Reveal><button className="lux-calendar" onClick={saveCalendar}><CalendarDays size={15} /> Simpan ke kalender</button></Reveal></section>
-        <section id="cerita" className="lux-story"><Reveal direction="zoom" className="story-film"><Photo src={w.storyPhoto} alt="Foto perjalanan cinta Gita dan Haidar" label="FOTO 03 · CERITA KITA" /><div className="story-film-shade" /><span className="story-film-script">It was always you.</span></Reveal><div className="lux-section story-words"><Floral className="story-floral" /><Reveal><span className="lux-kicker">EVERY LOVE HAS A STORY</span><h2>And this<br />is <em>ours.</em></h2></Reveal><div className="lux-timeline">{w.story.map((item, i) => <Reveal key={item.year} delay={i * 60} className="story-moment"><span className="story-year">{item.year}</span><span className="story-dot" /><h3>{item.title}</h3><p>{item.text}</p></Reveal>)}</div><Reveal><Ornament /></Reveal></div></section>
+        <section id="cerita" className="lux-story"><Reveal direction="zoom" className="story-film"><Photo src={w.storyPhoto} alt="Foto perjalanan cinta Gita dan Haidar" label="FOTO 03 · CERITA KITA" /><div className="story-film-shade" /><span className="story-film-script">It was always you.</span></Reveal><div className="lux-section story-words"><Floral className="story-floral" /><Reveal><span className="lux-kicker">EVERY LOVE HAS A STORY</span><h2>And this<br />is <em>ours.</em></h2></Reveal><div className="lux-timeline">{w.story.map((item, i) => <Reveal key={item.title} delay={i * 60} className="story-moment"><span className="story-dot" /><h3>{item.title}</h3><p>{item.text}</p></Reveal>)}</div><Reveal><Ornament /></Reveal></div></section>
         <Gallery active={effects} />
         <RSVP guest={guest} notify={setToast} />
         {w.gift.bank && w.gift.account && w.gift.holder && <section className="lux-gift lux-section"><Reveal><span className="lux-kicker">A LITTLE TOKEN OF LOVE</span><h2>Tanda <em>kasih.</em></h2><p>Doa dan kehadiran Anda adalah hadiah terindah bagi kami. Jika ingin memberikan tanda kasih, kami menerimanya dengan sepenuh hati.</p><div className="gift-account"><span>{w.gift.bank}</span><strong>{w.gift.account}</strong><span>a.n. {w.gift.holder}</span><button className="text-link" onClick={async () => { try { await navigator.clipboard.writeText(w.gift.account); setToast('Nomor rekening disalin.'); } catch { setToast('Silakan salin nomor rekening secara manual.'); } }}><Copy size={14} /> Salin rekening</button></div></Reveal></section>}
