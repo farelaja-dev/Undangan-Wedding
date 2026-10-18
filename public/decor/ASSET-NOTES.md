@@ -2,7 +2,7 @@
 
 - Asset: `floral-bouquet.png`, 1024 × 1536 RGBA PNG, with transparent background.
 - Method: built-in imagegen tool, `transparent_background: true`.
-- Created for the Haidar & Gita wedding invitation. CSS mirrors, rotates, and animates the image; it remains separate from all couple photos.
+- Created for the Gita & Haidar wedding invitation. CSS mirrors, rotates, and animates the image; it remains separate from all couple photos.
 
 ## Final prompt
 

@@ -32,5 +32,5 @@
 @media(max-height:580px){.invitation-cover{overflow-y:auto;display:block}.cover-content{min-height:530px;margin:0 auto;padding-top:30px}.cover-gate{position:fixed}.cover-arch{height:500px;top:265px}.cover-halo{top:265px}.cover-edition{display:none}.cover-content .wedding-names{font-size:72px}.cover-recipient>p{display:none}.cover-footnote{margin-top:13px}.cover-content>.ornament{margin:7px auto}.cover-date{margin:17px 0}.cover-wedding{margin-bottom:10px!important}}
 .floral{transform-origin:center center}
 .cover-floral-right{right:-140px;top:-250px}
-@media(max-width:800px){.cover-floral-right{right:-150px;top:-100px;width:255px}.cover-floral-left{left:-150px;width:290px;bottom:-100px}.cover-content{z-index:3}.cover-recipient{position:relative}}
+@media(max-width:800px){.cover-floral-right{right:-90px;top:-145px;width:220px}.cover-floral-left{left:-65px;width:245px;bottom:-105px}.cover-content{z-index:3}.cover-recipient{position:relative}}
 @media(prefers-reduced-motion:reduce){.luxury *, .luxury *:before,.luxury *:after{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none;filter:none}.petals-canvas{display:none}.cinematic-images{transform:none}.cover-opening{opacity:0}.lux-hero-copy{transform:translateY(-52%)}.luxury .gallery-slide:not(.active){opacity:0}}

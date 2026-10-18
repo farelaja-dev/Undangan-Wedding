@@ -1,6 +1,6 @@
-# Haidar & Gita — Undangan Pernikahan
+# Gita & Haidar — Undangan Pernikahan
 
-Undangan floral sinematik berwarna dusty blue, ivory, dan champagne, menggunakan React, Vite, dan JavaScript. Siap di-host sebagai website statis di Vercel. Nama mempelai sudah sesuai: **Haidar Syaddad Al Faruqi** dan **Gita Firanddia Putri Ramadhiany**.
+Undangan floral sinematik berwarna dusty blue, ivory, dan champagne, menggunakan React, Vite, dan JavaScript. Siap di-host sebagai website statis di Vercel. Nama mempelai sudah sesuai: **Gita Firanddia Putri Ramadhiany** dan **Haidar Syaddad Al Faruqi**.
 
 Pengalaman dimulai dengan cover personal dan tombol **Buka Undangan**. Dua pintu terbuka dengan animasi, diikuti slider foto dengan zoom pelan, ornamen bunga bergerak, partikel kelopak dan cahaya, serta teks/foto yang muncul bertahap saat di-scroll. Tidak ada navbar. Pada desktop, foto sinematik menetap di kiri sementara undangan mengalir di kanan; pada HP, undangan memenuhi layar.
 
@@ -17,9 +17,9 @@ Buka alamat yang ditampilkan Vite. Halaman undangan berada di `/`; pengelola tam
 
 ## Ubah isi undangan
 
-Semua pengaturan utama berada di **`src/config.js`**. Tanggal, waktu, lokasi, orang tua, dan cerita masih contoh; jangan langsung membagikannya sebagai data acara asli.
+Semua pengaturan utama berada di **`src/config.js`**. Tanggal dan lokasi sudah diatur untuk Kamis, 12 November 2026 di Agrowisata Gading Asri, Perumahan Taman Gading, Kabupaten Jember, Jawa Timur. Akad pukul 07.00 WIB sampai selesai; resepsi pukul 11.00 sampai 14.30 WIB. Data orang tua dan cerita masih contoh.
 
-- `bride` / `groom`: nama lengkap, panggilan, keluarga, foto.
+- `bride` / `groom`: nama lengkap, panggilan, keluarga.
 - `date` / `endDate`: waktu acara dengan zona WIB (`+07:00`), untuk hitung mundur dan kalender.
 - `dateLabel` / `shortDate`: teks tanggal yang ditampilkan. Sesuaikan dengan `date`.
 - `events`: nama acara dan teks jam. Sesuaikan dengan tanggal dan waktu sebenarnya.
@@ -27,32 +27,32 @@ Semua pengaturan utama berada di **`src/config.js`**. Tanggal, waktu, lokasi, or
 - `story`: tahun, judul, dan narasi perjalanan kalian.
 - `rsvpPhone`: nomor WhatsApp penerima, misalnya `6281234567890`. Jika kosong, RSVP dinonaktifkan dengan keterangan yang jelas. Pengunjung mengisi form, membuka WhatsApp, lalu menekan Kirim sendiri. Tidak ada database RSVP atau daftar ucapan publik.
 - `gift`: rekening opsional. Bagian hadiah muncul setelah `bank`, `account`, dan `holder` terisi.
-- `music`: opsional, misalnya `/audio/our-song.mp3`. Simpan file audio yang boleh digunakan di `public/audio/`. Jika diisi, musik mulai setelah pengunjung menekan **Buka Undangan** dan dapat dijeda lewat tombol musik. Tidak ada autoplay sebelum interaksi tamu.
+- `music`: sudah diisi `/audio/lagu.mp3`, menggunakan lagu dari `public/audio/lagu.mp3` dan diputar berulang. Musik mulai sesudah **Buka Undangan** ditekan. Ikon piringan berputar mengikuti pemutaran audio; ketuk untuk jeda/melanjutkan. Ganti dengan file yang boleh kamu gunakan di `public/audio/`, misalnya `/audio/our-song.mp3`, atau kosongkan untuk menonaktifkan musik. Tidak ada autoplay sebelum interaksi tamu.
+- `musicVolume`: volume awal antara 0–1, default `0.35` agar musik tetap lembut. Sumber pembuatan instrumental ada di `scripts/generate_music.py` (Python standard library, tidak diperlukan untuk menjalankan/deploy website).
 - `isDemo`: ubah menjadi `false` setelah informasi asli lengkap. Pemberitahuan contoh dan link admin di footer akan disembunyikan; `/admin` tetap dapat dibuka langsung.
 
 Jika kelak mengganti nama pasangan, sesuaikan juga judul dan metadata awal di `index.html`.
 
 ## Di mana foto diganti?
 
-Penanda **FOTO 01–07** ditampilkan di undangan. Panduan visual juga ada di `/admin` → **Panduan foto**.
+Penanda **FOTO 01–06** ditampilkan di undangan. Panduan visual juga ada di `/admin` → **Panduan foto**.
 
 | Penanda | Bagian | File di `public/photos/` | Saran ukuran |
 | --- | --- | --- | --- |
-| 01 | Foto utama | `hero.jpg` | 1800 × 1400 px |
-| 02 | Foto Haidar | `groom.jpg` | 900 × 1200 px |
-| 03 | Foto Gita | `bride.jpg` | 900 × 1200 px |
-| 04 | Cerita kita | `story.jpg` | 1000 × 1200 px |
-| 05 | Galeri pertama | `gallery-1.jpg` | 1200 × 900 px |
-| 06 | Galeri kedua | `gallery-2.jpg` | 900 × 1200 px |
-| 07 | Galeri ketiga | `gallery-3.jpg` | 1200 × 900 px |
+| 01 | Slider pembuka | `slider1.jpg`, `slider2.jpg`, `slider3.jpg` | Portrait 2:3 |
+| 02 | Foto bersama Gita dan Haidar | `foto_bersama.jpg` | 900 × 1200 px |
+| 03 | Cerita kita | `foto3.jpg` | 1000 × 1200 px |
+| 04 | Galeri pertama | `foto4.jpg` | 1200 × 900 px |
+| 05 | Galeri kedua | `foto5.jpg` | 900 × 1200 px |
+| 06 | Galeri ketiga | `foto6.jpg` | 1200 × 900 px |
 
 1. Ganti foto contoh dengan foto kalian. JPG, PNG, atau WebP dapat dipakai, asalkan path dan ekstensi di `src/config.js` sesuai.
-2. Foto Haidar dan Gita saat ini sengaja berupa placeholder. Setelah menambahkan file, isi `groom.photo` dengan `/photos/groom.jpg` dan `bride.photo` dengan `/photos/bride.jpg`.
+2. Bagian "We found our forever" memakai satu foto bersama, dengan nama Gita di atas dan Haidar di bawah. Foto sudah terpasang dari `public/photos/foto_bersama.jpg` melalui `couplePhoto` di `src/config.js`.
 3. Path di konfigurasi diawali `/photos/`, **bukan** `/public/photos/`.
 4. Setelah selesai, ubah `showPhotoLabels` menjadi `false` untuk menyembunyikan penanda.
 5. Jalankan build dan deploy ulang agar perubahan tampil online.
 
-Slider pembuka memakai `heroPhoto`, foto galeri pertama, dan `storyPhoto`. Mengganti ketiganya juga memperbarui foto slideshow. Foto penutup menggunakan `heroPhoto`. Ornamen bunga adalah aset terpisah di `public/decor/floral-bouquet.png`, sehingga tidak perlu diganti dengan foto pasangan.
+Slider pembuka memakai daftar `heroSlides` di `src/config.js`, berurutan `slider1.jpg`, `slider2.jpg`, dan `slider3.jpg`. Foto penutup menggunakan `heroPhoto`, saat ini `slider1.jpg`. Ornamen bunga adalah aset terpisah di `public/decor/floral-bouquet.png`, sehingga tidak perlu diganti dengan foto pasangan.
 
 Foto contoh diunduh dari Unsplash: [foto utama](https://unsplash.com/photos/photo-1519741497674-611481863552), [cerita](https://images.unsplash.com/photo-1511285560929-80b456fea0bc), [galeri 1](https://images.unsplash.com/photo-1532712938310-34cb3982ef74), [galeri 2](https://images.unsplash.com/photo-1523438885200-e635ba2c371e), [galeri 3](https://images.unsplash.com/photo-1511795409834-ef04bbd61622). Foto-foto ini hanya ilustrasi, bukan dokumentasi pasangan. Google Fonts memuat DM Sans, Cormorant Garamond, dan Italianno; tersedia font sistem sebagai fallback.
 

@@ -25,7 +25,7 @@ test('invitation shows real names, personal guest, working gallery and calendar'
   await expect(page.getByLabel('Jumlah tamu')).toHaveCount(0);
   const downloadEvent = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Simpan ke kalender' }).click();
-  expect((await downloadEvent).suggestedFilename()).toBe('pernikahan-haidar-gita.ics');
+  expect((await downloadEvent).suggestedFilename()).toBe('pernikahan-gita-haidar.ics');
   await page.getByRole('button', { name: 'Pilih foto galeri 1' }).click();
   await page.getByRole('button', { name: 'Slide berikutnya' }).click();
   await expect(page.getByRole('button', { name: 'Pilih foto galeri 2' })).toHaveAttribute('aria-pressed', 'true');
@@ -86,13 +86,13 @@ test('CSV import, deduplication, manual addition, filter, share, export and pers
   expect(shared.searchParams.get('text')).toContain('Haidar Syaddad Al Faruqi');
   const downloadEvent = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Ekspor CSV' }).click();
-  expect((await downloadEvent).suggestedFilename()).toBe('tamu-haidar-gita.csv');
+  expect((await downloadEvent).suggestedFilename()).toBe('tamu-gita-haidar.csv');
   await page.getByLabel('Cari tamu').clear();
   await page.evaluate(() => document.fonts.ready);
   await page.screenshot({ path: testInfo.outputPath('admin.png'), fullPage: true });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
   await page.getByRole('button', { name: 'Panduan foto' }).click();
-  await expect(page.getByText('public/photos/groom.jpg')).toBeVisible();
+  await expect(page.getByText('public/photos/foto_bersama.jpg')).toBeVisible();
 });
 
 test('rejects malformed CSV without changing the guest list', async ({ page }) => {
