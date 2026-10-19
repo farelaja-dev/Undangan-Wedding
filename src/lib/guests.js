@@ -24,12 +24,10 @@ export function invitationUrl(base, name) {
   if (!['http:', 'https:'].includes(url.protocol)) throw new Error('Gunakan alamat website http atau https.');
   const displayName = name.trim().slice(0, 150);
   if (!displayName) throw new Error('Nama tamu wajib diisi.');
-  let slug = displayName.normalize('NFKD').replace(/\p{M}/gu, '').toLocaleLowerCase('id').replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-|-$/g, '') || 'tamu';
-  if (reservedPaths.has(slug)) slug = `tamu-${slug}`;
-  url.pathname = `/${slug}`;
+  url.pathname = '/';
   url.search = '';
   url.hash = '';
-  if (guestNameFromLocation(url) !== displayName) url.searchParams.set('to', displayName);
+  url.searchParams.set('to', displayName);
   return url.toString();
 }
 

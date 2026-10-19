@@ -34,7 +34,7 @@ test('deduplicates both existing guests and repeated names within an import', ()
 test('creates safely encoded personal links without admin path, stale queries or anchors', () => {
   const name = 'Bapak Budi & Ibu Sari + Keluarga / ♥';
   const link = new URL(invitationUrl('https://example.vercel.app/admin?old=1#test', name));
-  assert.notEqual(link.pathname, '/');
+  assert.equal(link.pathname, '/');
   assert.equal(guestNameFromLocation(link), name);
   assert.equal(link.searchParams.get('to'), name);
   assert.equal(link.searchParams.has('old'), false);
@@ -42,9 +42,9 @@ test('creates safely encoded personal links without admin path, stale queries or
   assert.throws(() => invitationUrl('javascript:alert(1)', name), /http/);
 });
 
-test('generates readable paths and restores guest names without a database', () => {
+test('generates query-only links and preserves older path links', () => {
   const link = new URL(invitationUrl('https://example.com/admin?old=1', 'Pak Halim'));
-  assert.equal(link.href, 'https://example.com/pak-halim');
+  assert.equal(link.href, 'https://example.com/?to=Pak+Halim');
   assert.equal(guestNameFromLocation(link), 'Pak Halim');
   assert.equal(guestNameFromLocation({ pathname: '/ibu-sari/' }), 'Ibu Sari');
   assert.equal(guestNameFromLocation({ search: '?to=H.%20Halim%2C%20S.T.' }), 'H. Halim, S.T.');

@@ -26,11 +26,11 @@ npm install
 npm run dev
 ```
 
-Buka alamat yang ditampilkan Vite. Halaman undangan berada di `/`; pengelola tamu ada di `/admin`. Contoh undangan personal: `/pak-halim` menampilkan Pak Halim di cover dan formulir. Link lama `?to=...` tetap berfungsi.
+Buka alamat yang ditampilkan Vite. Halaman undangan berada di `/`; pengelola tamu ada di `/admin`. Contoh undangan personal: `/?to=Pak+Halim` menampilkan Pak Halim di cover dan formulir. Link lama `/pak-halim` tetap berfungsi.
 
 ## Ubah isi undangan
 
-Semua pengaturan utama berada di **`src/config.js`**. Tanggal dan lokasi sudah diatur untuk Kamis, 12 November 2026 di Agrowisata Gading Asri, Perumahan Taman Gading, Kabupaten Jember, Jawa Timur. Akad pukul 07.00 WIB sampai selesai; resepsi pukul 11.00 sampai 14.30 WIB. Data orang tua masih perlu diisi.
+Semua pengaturan utama berada di **`src/config.js`**. Tanggal dan lokasi sudah diatur untuk Kamis, 12 November 2026 di Agrowisata Gading Asri, Perumahan Taman Gading, Kabupaten Jember, Jawa Timur. Akad pukul 07.00 WIB sampai selesai; resepsi pukul 11.00 sampai 14.30 WIB. Data orang tua sudah diisi sesuai nama yang diberikan.
 
 - `bride` / `groom`: nama lengkap, panggilan, keluarga.
 - `date` / `endDate`: waktu acara dengan zona WIB (`+07:00`), untuk hitung mundur dan kalender.
@@ -79,14 +79,14 @@ Foto contoh diunduh dari Unsplash: [foto utama](https://unsplash.com/photos/phot
 2. Isi kolom `nama` (wajib), `telepon` dan `grup` (opsional). Kolom nomor sebaiknya berformat teks di Excel agar digitnya tidak berubah.
 3. Impor CSV (maksimal 2 MB / 5.000 tamu per impor), periksa pratinjau, lalu klik **Impor**.
 4. Tamu dengan pasangan nama + nomor yang sama otomatis dilewati. Nama yang sama dengan nomor berbeda tetap dianggap tamu berbeda.
-5. Isi alamat website undangan dengan URL Vercel final. Link otomatis dibuat dari nama, misalnya `Pak Halim` menjadi `/pak-halim` dan `Ibu Sari` menjadi `/ibu-sari`; tombol salin menyalin link tersebut; tombol WhatsApp menyiapkan pesan untuk dikirim secara manual. Tamu tanpa nomor akan membuka pemilih percakapan WhatsApp.
+5. Isi alamat website undangan dengan URL Vercel final. Link otomatis dibuat dari nama, misalnya `Pak Halim` menjadi `/?to=Pak+Halim` dan `Ibu Sari` menjadi `/?to=Ibu+Sari`; tombol salin menyalin link tersebut; tombol WhatsApp menyiapkan pesan untuk dikirim secara manual. Tamu tanpa nomor akan membuka pemilih percakapan WhatsApp.
 6. Cari/filter tamu, tambah manual, hapus, atau **Ekspor CSV** lengkap dengan link personal.
 
-Nama dengan gelar, tanda baca, aksen, atau kapitalisasi khusus mendapat parameter `?to=` tambahan agar nama di cover tetap persis seperti CSV. Nomor telepon tidak dimasukkan ke link. Tidak perlu menambah tabel Supabase atau deploy ulang setiap mengimpor tamu; link bekerja langsung dari path/parameter URL, termasuk pada perangkat tamu lain.
+Semua link memakai satu parameter `?to=` agar nama di cover tetap persis seperti CSV, termasuk gelar, tanda baca, aksen, dan kapitalisasi. Nama tidak diulang di path URL. Nomor telepon tidak dimasukkan ke link. Tidak perlu menambah tabel Supabase atau deploy ulang setiap mengimpor tamu; link bekerja langsung dari path/parameter URL, termasuk pada perangkat tamu lain.
 
 CSV dengan koma di dalam nama harus menggunakan tanda kutip, misalnya `"Rizky, S.Kom."`. CSV UTF-8 dengan delimiter koma maupun titik koma didukung. Export melindungi sel yang berpotensi dibaca sebagai formula spreadsheet.
 
-**Penyimpanan:** data tamu hanya ada di `localStorage` browser/perangkat yang dipakai. Tidak ada login, backend, sinkronisasi lintas perangkat, atau daftar tamu yang dikirim ke server. Halaman `/admin` adalah alat lokal yang dapat diakses publik; pengunjung lain hanya melihat daftar di browser mereka sendiri. Ekspor CSV untuk backup/pindah perangkat. Jangan commit file CSV tamu pribadi ke repo publik.
+**Penyimpanan:** data tamu hanya ada di `localStorage` browser/perangkat yang dipakai. Daftar tamu tidak disinkronkan lintas perangkat atau dikirim ke server. Akses `/admin` dilindungi login HTTP Basic di server; data tamu tetap disimpan di browser admin, terpisah dari ucapan publik di Supabase. Ekspor CSV untuk backup/pindah perangkat. Jangan commit file CSV tamu pribadi ke repo publik.
 
 ## Deploy ke Vercel
 
@@ -113,3 +113,16 @@ npm run test:browser
 ```
 
 Tes browser menggunakan Playwright dengan Google Chrome terpasang (`channel: 'chrome'`). Jika belum ada Chrome, pasang browser yang sesuai atau ubah channel pada `playwright.config.js`. Tes mencakup desktop dan mobile, impor CSV, duplikat, tambah tamu, pencarian, persistensi browser, ekspor, link WhatsApp, personalisasi, galeri, kalender, dan overflow layout. Hasil screenshot ada di folder `test-results/` yang diabaikan Git.
+
+## Password admin
+
+`/admin`, konfirmasi sesi `/api/admin-session`, dan bundle JavaScript admin dilindungi pemeriksaan HTTP Basic di server. Browser menampilkan dialog username/password. Tidak ada password atau status login yang disimpan di localStorage atau bundle frontend. Pemeriksaan yang sama berlaku di `npm run dev` dan `npm run preview`.
+
+- Lokal: isi `ADMIN_USERNAME` dan `ADMIN_PASSWORD` di `.env.local`, lalu restart Vite. Password minimal 20 karakter; gunakan password acak yang unik.
+- Vercel: tambah kedua variabel itu pada Environment Variables untuk environment deployment yang digunakan, lalu redeploy. **Jangan** memakai awalan `VITE_` atau `NEXT_PUBLIC_` untuk kredensial admin.
+- Jika variabel belum diisi atau password terlalu pendek, admin tetap terkunci (HTTP 503), bukan terbuka otomatis.
+- Gunakan HTTPS pada domain online. Browser dapat mengingat login Basic sampai sesi browser ditutup; gunakan jendela privat saat memakai perangkat bersama. Untuk mengganti password, ubah environment variable dan redeploy/restart.
+- Ini membatasi akses admin, bukan autentikasi tamu: komentar publik tetap mengikuti kebijakan Supabase. Daftar CSV tetap lokal di browser; autentikasi tidak mengubahnya menjadi penyimpanan server.
+- Jalur yang menolak login memberi HTTP 401; halaman admin tidak dikirim sebelum kredensial valid. Uji kembali `/admin` dari jendela privat setelah deploy Vercel karena `vite build` saja tidak menjalankan middleware produksi. Hosting statis selain Vercel perlu proteksi server yang setara.
+
+Middleware mengikuti [dokumentasi Routing Middleware Vercel](https://vercel.com/docs/routing-middleware/getting-started). Untuk membatasi percobaan login berulang pada deployment, gunakan aturan rate limit Vercel Firewall untuk `/admin`; tidak ada rate limit lintas instance yang diklaim oleh kode ini.

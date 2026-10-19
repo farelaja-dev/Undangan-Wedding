@@ -7,7 +7,7 @@
     "dev": "vite --host 127.0.0.1",
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1",
-    "test": "node --test tests/guests.test.js",
+    "test": "node --test tests/guests.test.js tests/admin-auth.test.js",
     "test:browser": "playwright test"
   },
   "dependencies": {

@@ -1,9 +1,9 @@
-// Nama, tanggal, lokasi, dan cerita sudah sesuai. Data orang tua masih perlu diisi.
+// Nama, orang tua, tanggal, lokasi, dan cerita sudah sesuai data pasangan.
 // FOTO: letakkan file di public/photos/, lalu ubah path di bawah.
 // Nama file boleh berbeda, asalkan path di sini sama dengan nama file kamu.
 export const wedding = {
-  bride: { name: 'Gita', fullName: 'Gita Firanddia Putri Ramadhiany', parents: 'Putri dari Bapak [nama ayah] & Ibu [nama ibu]' },
-  groom: { name: 'Haidar', fullName: 'Haidar Syaddad Al Faruqi', parents: 'Putra dari Bapak [nama ayah] & Ibu [nama ibu]' },
+  bride: { name: 'Gita', fullName: 'Gita Firanddia Putri Ramadhiany', parents: 'Putri dari Bapak Firman Suhestiyono & Ibu Dyah Wigatiningtyas' },
+  groom: { name: 'Haidar', fullName: 'Haidar Syaddad Al Faruqi', parents: 'Putra dari Bapak Moch. Afifi & Ibu Siti Rohma' },
   date: '2026-11-12T07:00:00+07:00', // Waktu WIB; ganti tanggal dan jam akad
   endDate: '2026-11-12T14:30:00+07:00',
   dateLabel: 'Kamis, 12 November 2026',
