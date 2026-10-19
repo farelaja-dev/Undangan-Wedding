@@ -1,4 +1,8 @@
 node_modules/
+daftar-tamu-teman-relawan.csv
+daftar-tamu-dan-link-undangan.xlsx
+daftar-tamu-dan-link-undangan-130.xlsx
+daftar-undangan-130-diperbaiki.xlsx
 dist/
 .vercel/
 .env
